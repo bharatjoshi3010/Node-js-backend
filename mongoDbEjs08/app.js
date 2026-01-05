@@ -16,4 +16,12 @@ app.get('/', (req, res) => {
     res.render("index");            //it is rendering index.ejs
 })
 
+app.get('/read', (req, res) => {
+    res.render("read");            //it is rendering index.ejs
+})
+
+app.post('/create', (req, res) =>{
+    
+})
+
 app.listen(3000);
