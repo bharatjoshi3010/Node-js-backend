@@ -40,5 +40,21 @@ app.get('/delete/:id', async(req, res) => {
     let allusers = await userModel.findOneAndDelete({_id: req.params.id});
     res.redirect("/read");           //it is rendering index.ejs
 })
+app.get('/edit/:id', async(req, res) => {
+    let users = await userModel.findOne({_id : req.params.id});
+    res.render("edit", {users});           //it is rendering index.ejs
+})
+
+app.post('/update/:id', async (req, res) => {
+    console.log("inside update route")
+    // userModel.findOneUpdate(findone, update, {new: true}); //syntax of update (this new true helps to give the new created user)
+
+    let updateduser = await userModel.findOneAndUpdate({_id : req.params.id}, {name: req.body.name, email:req.body.email, image:req.body.image}, {new: true});
+    //it changes updates the name to the "bharat joshiii" for the user whos username is "bharat"
+
+
+    res.redirect("/read");
+
+})
 
 app.listen(3000);

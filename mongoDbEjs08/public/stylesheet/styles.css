@@ -3,6 +3,10 @@
     padding: 0;
     box-sizing: border-box;
 }
+body {
+    background-color: #18181b; /* zinc-900 */   
+    /* fix for the half background issues */
+}
 
 html, body{
     width: 100%;
