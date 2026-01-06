@@ -1,0 +1,11 @@
+things to do step by step
+
+create user account 
+    steup moongose
+    schema
+    model
+    usercreate -> password -> hash
+    jwt token -> cookie
+
+for login part 
+    login -> token -> decrypte -> email 
