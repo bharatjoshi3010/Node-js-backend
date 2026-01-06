@@ -1,0 +1,9 @@
+authentication : verifying the user before giving him access
+authrization :  checking the access permits(like -> is user can change the database or just a read-only user )
+in this tutorial we see 
+cookie : server se browser par kuch data set krwa dena
+        once cookie is stored everytime it works(attached with every route automatically);
+autherizationHeader : we always need to attach it 
+1-> how to set cookies
+2-> use of  bcrypt for password encryption and decryption
+3-> Jwt kya hai and How to store and retrive data from Jwt
