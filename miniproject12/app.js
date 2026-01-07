@@ -58,28 +58,23 @@ app.post('/register', async(req,res) => {
 app.get("/login",(reqq, res) => {
     res.render("login");
 })
+
 app.post('/login', async(req,res) => {
     let {email, password} = req.body;
-
     let user = await userModel.findOne({email});
-    if(user) return res.status(500).send("User Already Registered");     //if user with same email exist then it comes back from here and not create the new user
+    if(!user) return res.status(500).send("Something went wrong");     //if user with this email do not exist then we will say "something went wrong "
 
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(password, salt, async (err, hash) => {
-            let user = await userModel.create({
-                username,
-                email, 
-                age,
-                name,
-                password: hash
-            });
-
-            let token = jwt.sign({email: email, userid: user._id}, "shhhh");
-            res.cookie("token", token);
-            res.send("registered");
-        })
+    bcrypt .compare(password, user.password, function (err, result){
+        if(result) res.status(200).send("you can login");
+        else res.redirect("/login");
     })
-
 });
+
+app.get('/logout', (req, res) => {
+    res.cookie("token", "");   //it means the cookie named token is now blank
+    res.redirect("/login");
+});
+
+
 
 app.listen(3000);
