@@ -12,6 +12,7 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const path = require('path'); //paackage of node no need to install.
 
 //setting up the DB models 
 const userModel = require("./models/user");
@@ -23,6 +24,10 @@ const multerConfig = require("./config/multerConfig");
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
+//setting up path for the express static files
+app.use(express.urlencoded({ extended: true}));
+app.use(express.static(path.join(__dirname, "public")));
 
 //setting the parser so it can sent cookies properly
 app.use(cookieParser());
@@ -141,16 +146,24 @@ app.get("/test", (req, res)=>{
     res.render("test");
 });
 
-app.post("/upload", upload.single("image"), (req, res) => {
+//profile pic upload 
+app.get("/profile/upload", (req,res)=>{
+    res.render("profileupload");
+});
+app.post("/upload",isLoggedIn, multerConfig.single("image"), async (req, res) => {
     console.log(req.file);
+    let user = await userModel.findOne({email: req.user.email})
     //the text data of the form is stored inside the req.body 
     //and the details about the file is stored inside the req.file.
     //you can see the uploaded file on the folder which you provided as a destination on the multer.diskstorage
-    res.redirect("/test");
+    user.profilepic = req.file.filename;
+    await user.save();
+    res.redirect("/profile");
 });
 
-//making a middlewere for protected routes
 
+
+//making a middlewere for protected routes
 function isLoggedIn(req, res, next){                    //we can apply this middlewere to the routes so that it can check that, is user is logged in or not, if not then it will not open that route or redirect him to the login or register route.(thats why it is called protected route)
     if(req.cookies.token === "") res.redirect("/login");
     else{
