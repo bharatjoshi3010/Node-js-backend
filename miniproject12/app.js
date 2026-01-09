@@ -1,9 +1,10 @@
 //npm init
-//npm i express
-//npm i mongoose
-//npm i bcrypt jsonwebtoken
-//npm i cookie-parser
-//npm i ejs
+//npm i express         (for making the routes)
+//npm i mongoose        (for connecting mongoDB server and the nodejs.)
+//npm i bcrypt jsonwebtoken (for creating the session tokens so that we can make cookies of the session)
+//npm i cookie-parser (for transfering cookies from one to another route)
+//npm i ejs (for rendering the ejs view )
+//npm i multer (for storing the files)
 
 //setiing up the package imports
 const express = require('express');
@@ -11,6 +12,10 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");   //its a node js package you can use it without installing it
+const path = require("path"); //also a node package
+const multer = require("multer");
+
 
 //setting up the DB models 
 const userModel = require("./models/user");
@@ -23,8 +28,32 @@ app.use(express.urlencoded({extended: true}));
 
 //setting the parser so it can sent cookies properly
 app.use(cookieParser());
+ 
+// crypto.randomBytes(12, function(err, bytes)  {     //making some random names with crypto(and this 12 is number of bytes)
+//             console.log(bytes);    //bytes are in hexadecimal format so we can convert it
+//             console.log(bytes.toString("hex"));  //now this byte is converted to hexadecimal string
+//           })
 
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './public/images/uploads')    //its the folder where file uploads
+    },
 
+    //now we will give a unique name to our file
+    filename: function(req, file, cb){ 
+        crypto.randomBytes(12, function(err, bytes){     //making some random names with crypto
+            console.log(bytes);    //bytes are in hexadecimal format so we can convert it
+            console.log(bytes.toString("hex"));  //now this byte is converted to hexadecimal string
+            const fn = bytes.toString("hex") + path.extname(file.originalname)
+            //the file in the perameter contains all the info about the file, so here we are extracting the files exstention from there.(this extname gets the extension from the original name)
+            cb(null, fn)           //cb function helps to set filename  
+            //the first perameter in cb is error and second is the name of the file
+          })
+        
+    }
+})
+
+const upload = multer({ storage: storage})
 
 app.get('/', (req,res) => {
     res.render("index");
@@ -134,6 +163,19 @@ app.post("/update/:id", isLoggedIn, async (req, res) => {
     let post = await postModel.findOneAndUpdate({_id: req.params.id},{content : req.body.content});
     res.redirect("/profile");
 })
+
+//making a test page 
+app.get("/test", (req, res)=>{
+    res.render("test");
+});
+
+app.post("/upload", upload.single("image"), (req, res) => {
+    console.log(req.file);
+    //the text data of the form is stored inside the req.body 
+    //and the details about the file is stored inside the req.file.
+    //you can see the uploaded file on the folder which you provided as a destination on the multer.diskstorage
+    res.redirect("/test");
+});
 
 //making a middlewere for protected routes
 
