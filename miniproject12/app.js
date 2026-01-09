@@ -104,6 +104,24 @@ app.post("/post", isLoggedIn, async(req,res) => {    //we can post only if we ar
     //we sent the user to the profile page
 })
 
+//making the like route
+app.get("/like/:id", isLoggedIn, async(req,res) => {    //so this is the like route which works only if the user is logged in otherwise it will send user to the login page (this work is possible through the middlewere we make -> isLoggedIn);
+
+    let post = await postModel.findOne({_id: req.params.id}).populate("user");
+
+    if(post.likes.indexOf(req.user.userid) === -1){             //index of returns -1 if, it do not find the value inside the paranthesis in the array(element not present)
+        post.likes.push(req.user.userid);   //in posts like filed we added this users id, so we know who liked the post
+    }
+    else//if user already liked it
+        {
+          post.likes.splice(post.likes.indexOf(req.user.userid), 1);    //we removed the users cont from the like array of the post(user unliked the post)  
+    }
+    
+    await post.save();    //we changed the values inside post so we saved it every time whether we liked or unliked
+    res.redirect("/profile");
+    //we sent the user to the profile page
+})
+
 //making a middlewere for protected routes
 
 function isLoggedIn(req, res, next){                    //we can apply this middlewere to the routes so that it can check that, is user is logged in or not, if not then it will not open that route or redirect him to the login or register route.(thats why it is called protected route)
