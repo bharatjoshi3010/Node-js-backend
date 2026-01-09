@@ -35,7 +35,7 @@
                             <%= post.likes.indexOf(user._id) === -1 ? "Like" : "Unlike" %>
                             <!-- if user already liked then we show Unlike otherwise we show like -->
                         </a>
-                        <a class="text-zinc-600" href="">Edit</a>
+                        <a class="text-zinc-600" href="/edit/<%= post._id %>">Edit</a>
                     </div>
                 </div>
                 <%}) %>

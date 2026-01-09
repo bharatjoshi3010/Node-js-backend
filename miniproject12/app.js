@@ -122,6 +122,19 @@ app.get("/like/:id", isLoggedIn, async(req,res) => {    //so this is the like ro
     //we sent the user to the profile page
 })
 
+//making the edit route
+app.get("/edit/:id", isLoggedIn, async(req,res) => {    //so this is the edit route which works only if the user is logged in otherwise it will send user to the login page (this work is possible through the middlewere we make -> isLoggedIn);
+
+    let post = await postModel.findOne({_id: req.params.id}).populate("user");    //finding the post and storing its detail on post variable
+    res.render("edit", {post});     //giving this details to edit.ejs page
+})
+
+//making update route for saving the changes in the edit page
+app.post("/update/:id", isLoggedIn, async (req, res) => {
+    let post = await postModel.findOneAndUpdate({_id: req.params.id},{content : req.body.content});
+    res.redirect("/profile");
+})
+
 //making a middlewere for protected routes
 
 function isLoggedIn(req, res, next){                    //we can apply this middlewere to the routes so that it can check that, is user is logged in or not, if not then it will not open that route or redirect him to the login or register route.(thats why it is called protected route)
