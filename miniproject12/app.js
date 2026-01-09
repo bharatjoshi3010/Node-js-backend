@@ -55,7 +55,7 @@ app.post('/register', async(req,res) => {
 });
 
 //setting up the route for signin
-app.get("/login",(reqq, res) => {
+app.get("/login",(req, res) => {
     res.render("login");
 })
 
@@ -68,7 +68,7 @@ app.post('/login', async(req,res) => {
         if(result) {
             let token = jwt.sign({email: email, userid: user._id}, "shhhh");
             res.cookie("token", token);
-            res.status(200).send("you can login");}
+            res.status(200).redirect("/profile");}
         else res.redirect("/login");
     })
 });
@@ -78,21 +78,43 @@ app.get('/logout', (req, res) => {
     res.redirect("/login");
 });
 
-app.get("/profile", isLoggedIn, (req,res) => {    //so this is the profile route which opens only if the user is logged in otherwise it will send user to the login page (this work is possible through the middlewere we make -> isLoggedIn);
-
+app.get("/profile", isLoggedIn, async(req,res) => {    //so this is the profile route which opens only if the user is logged in otherwise it will send user to the login page (this work is possible through the middlewere we make -> isLoggedIn);
     console.log(req.user);   //reading the data coming from the middlewere
+
+    let user = await userModel.findOne({email: req.user.email}).populate("post"); //we are saying that populate the post filed
+
+    res.render("profile", {user});
+    //we sent the user to the profile page
+})
+
+//post route for creating the posts
+app.post("/post", isLoggedIn, async(req,res) => {    //we can post only if we are logged in that's why here we put loggedIn protected (middlewere)
+    let user = await userModel.findOne({email: req.user.email})  //tells which user is logged in
+    let {content} = req.body; //it takes the value from the form and give content -> textarea here.
+
+    //creating the post through post model
+    let post = await postModel.create({       //post knows that user created the post
+        user: user._id,
+        content: content  
+    })
+
+    user.post.push(post._id); //tells the user that he created a post(interting the post id in users posts array)
+    await user.save();    //we changed the things manually so, we have to save it
+    res.redirect("/profile")
+    //we sent the user to the profile page
 })
 
 //making a middlewere for protected routes
 
 function isLoggedIn(req, res, next){                    //we can apply this middlewere to the routes so that it can check that, is user is logged in or not, if not then it will not open that route or redirect him to the login or register route.(thats why it is called protected route)
-    if(req.cookies.token === "") res.send("you must be logged in. ");
+    if(req.cookies.token === "") res.redirect("/login");
     else{
                              //token           //secret key        
         let data = jwt.verify(req.cookies.token, "shhhh"); // it will convert the jwt token's data to the original object and again give it to the 'data' variable here.
-        req.user = data;    //if logged in then we sent the data to the user , and we can access it in that route
+        req.user = data;   //if logged in then we sent the data to the user , and we can access it in that route
+        next();
     }
-    next();
+    
 }
 
 
