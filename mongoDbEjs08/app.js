@@ -1,3 +1,7 @@
+//npm init
+//npm i express
+//npm i mongoose
+
 const express = require('express');
 const app = express();
 const path = require('path');
