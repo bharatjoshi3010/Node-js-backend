@@ -12,7 +12,6 @@ const userSchema = mongoose.Schema({
         type: Array,
         default: [],
     },
-    idAdmin: Boolean,
     orders: {
         type: Array,
         default: [],
