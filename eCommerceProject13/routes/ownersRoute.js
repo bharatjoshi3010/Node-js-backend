@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const ownerModel = require("../models/owners-model");
+const isownerloggedin = require("../middlewares/isownerLoggedin");
+const { generateToken } = require("../utils/generateToken");
 
 console.log(process.env.NODE_ENV);     
 //it will tell the name of the environment, and if environment it not selected then it will return undefined
@@ -33,8 +35,39 @@ if(process.env.NODE_ENV === "development"){
     });
 }                               
 
+router.get("/", function(req, res){
+    res.render("owner-login");
+})
 
-router.get("/admin", function(req, res){
+router.post("/login", async function(req, res){
+    let { email, password } = req.body;
+    let owner = await ownerModel.findOne({ email: email });
+    //checking if there is a user with this type of email or not.
+    //if not then give a error
+    if (!owner) {
+        req.flash("error", "Something went wrong");
+        //flash msg this is a new thing
+        //we created this flash msg in anothor route and then we sent it to the "/" route, so we can assecc this msg in "/" route also
+        return res.redirect("/");
+    }
+    //and if there is really a user with that email...
+    else {
+            if (password === owner.password) {
+                let token = generateToken(owner);
+                res.cookie("token", token);
+                res.redirect("/owners/admin");
+            }
+            else {
+                req.flash("error", "Something went wrong");
+                //flash msg this is a new thing
+                //we created this flash msg in anothor route and then we sent it to the "/" route, so we can assecc this msg in "/" route also
+                return res.redirect("/");
+            }
+        
+    }
+})
+
+router.get("/admin",isownerloggedin, function(req, res){
     let success = req.flash("success");
     console.log(success);
     res.render("createproducts", { success});
