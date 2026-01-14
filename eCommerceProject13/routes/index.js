@@ -22,7 +22,17 @@ router.get("/shop", isloggedin, async function(req, res){
 router.get("/cart", isloggedin, async function(req, res){
     let user = await userModel.findOne({email: req.user.email}).populate("cart");
 
-    const bill = Number(user.cart[0].price) + 20 -Number(user.cart[0].discount);
+    let price = 0;
+    let discount = 0;
+    let shipping = 0;
+
+    user.cart.forEach(item => {
+        price = price + Number(item.price);
+        shipping = shipping + 20;
+        discount = discount + Number(item.discount) ;
+    });
+
+    const bill = price-discount+shipping;
 
     res.render("cart", {user, bill});
 
