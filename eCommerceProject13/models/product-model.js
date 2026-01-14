@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
-    image : String,
+    image : Buffer,
+    //multer saving the data of image as buffer
     name : String,
     price : Number,
     discount : {
@@ -9,8 +10,8 @@ const productSchema = mongoose.Schema({
         default : 0
     },
     bgcolor : String,
-    panelColor : String,
-    textColor : String
+    panelcolor : String,
+    textcolor : String
 });
 
 module.exports = mongoose.model("products", productSchema);

@@ -2,6 +2,7 @@
 //npm i cookie-parser
 //npm i ejs
 // npm i jsonwebtoken bcrypt dotenv cookie-parser
+// npm i multer
 
 const express = require("express");
 const app = express();

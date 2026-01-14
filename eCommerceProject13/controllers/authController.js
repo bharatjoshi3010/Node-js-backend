@@ -30,7 +30,7 @@ module.exports.registerUser = async function (req, res) {
                     })
                     let token = generateToken(user);  //it will create the cookie for the user which we just created.
                     res.cookie("token", token);  //setting the token once signin
-                    res.render("shop");
+                    res.redirect("../shop");
                 }
             });
         });
@@ -58,7 +58,7 @@ module.exports.loginUser = async function (req, res) {
             if (result) {
                 let token = generateToken(user);
                 res.cookie("token", token);
-                res.render("shop");
+                res.redirect("../shop");
             }
             else {
                 req.flash("error", "Something went wrong");
